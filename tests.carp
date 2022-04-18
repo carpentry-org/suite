@@ -1,0 +1,27 @@
+(load "main.carp")
+
+(use Test)
+
+(Suite.defsuite addition
+  (assert-equal test
+                2
+                (+ 1 1)
+                "integer addition works")
+  (assert-equal test
+                2.0
+                (+ 1.0 1.0)
+                "double addition works")
+)
+
+(Suite.defsuite subtraction
+  (assert-equal test
+                1
+                (- 2 1)
+                "integer subtraction works")
+  (assert-equal test
+                1.0
+                (- 2.0 1.0)
+                "double subtraction works")
+)
+
+(Suite.run-all)

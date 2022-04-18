@@ -1,0 +1,27 @@
+(load "Test.carp")
+
+(defmodule Suite
+  (defdynamic *suites* [])
+
+  (defmacro defsuite [name :rest forms]
+    (let-do [sym (gensym)]
+      (eval
+        `(defn %sym []
+          (let-do [test &(Test.State.init 0 0)]
+            (IO.println %(str "Running suite " name))
+            %(cons-last
+              `@(Test.State.failed test)
+              (cons-last
+                `(Test.print-test-results test)
+                `(do %@(with-test-internal 'test forms)))))))
+      (set! Suite.*suites* (cons sym Suite.*suites*))))
+
+  (defmacro run-all []
+    (do
+      (eval
+        `(defn main []
+            (do %@(map (fn [suite] `(ignore (%suite))) Suite.*suites*))))
+      (build)
+      (run)
+      (quit)))
+)
