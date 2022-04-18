@@ -27,18 +27,18 @@ is a simple test suite abstraction.
 (Suite.run-all)
 ```
 
-will produce:
+will produce (colorized in your terminal):
 
 ```
 Running suite subtraction
 Test 'integer subtraction works' passed
 Results:
-  |==|
+  |=|
   Passed: 1    Failed: 0
 Running suite addition
 Test 'integer addition works' passed
 Results:
-  |==|
+  |=|
   Passed: 1    Failed: 0
 ```
 
