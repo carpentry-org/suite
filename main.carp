@@ -10,18 +10,26 @@
           (let-do [test &(Test.State.init 0 0)]
             (IO.println %(str "Running suite " name))
             %(cons-last
-              `@(Test.State.failed test)
-              (cons-last
-                `(Test.print-test-results test)
-                `(do %@(with-test-internal 'test forms)))))))
+              `(Pair.init @(Test.State.passed test) @(Test.State.failed test))
+              (cons-last `(Test.print-test-results test)
+                         `(do %@(with-test-internal 'test forms)))))))
       (set! Suite.*suites* (cons sym Suite.*suites*))))
 
   (defmacro run-all []
     (do
       (eval
         `(defn main []
-            (do %@(map (fn [suite] `(ignore (%suite))) Suite.*suites*))))
+          (let-do [total-passed 0
+                   total-failed 0]
+            %@(map
+              (fn [suite]
+                `(let-do [r (%suite)]
+                  (set! total-passed (+ total-passed @(Pair.a &r)))
+                  (set! total-failed (+ total-failed @(Pair.b &r)))))
+              Suite.*suites*)
+            (IO.println &(String.concat &[@"
+All suites: " (Int.str total-passed) @" passed, " (Int.str total-failed) @" failed"]))
+            total-failed)))
       (build)
       (run)
-      (quit)))
-)
+      (quit))))
