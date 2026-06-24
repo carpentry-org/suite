@@ -5,7 +5,7 @@ is a simple test suite abstraction.
 ## Usage
 
 ```clojure
-(load "git@github.com:carpentry-org/suite@0.0.1")
+(load "git@github.com:carpentry-org/suite@0.1.0")
 
 (use Test)
 
