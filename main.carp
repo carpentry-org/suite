@@ -5,31 +5,29 @@
 
   (defmacro defsuite [name :rest forms]
     (let-do [sym (gensym)]
-      (eval
-        `(defn %sym []
-          (let-do [test &(Test.State.init 0 0)]
-            (IO.println %(str "Running suite " name))
-            %(cons-last
-              `(Pair.init @(Test.State.passed test) @(Test.State.failed test))
-              (cons-last `(Test.print-test-results test)
-                         `(do %@(with-test-internal 'test forms)))))))
-      (set! Suite.*suites* (cons sym Suite.*suites*))))
+      (set! Suite.*suites* (cons sym Suite.*suites*))
+      `(defn %sym []
+        (let-do [test &(Test.State.init 0 0)]
+          (IO.println %(str "Running suite " name))
+          %(cons-last
+            `(Pair.init @(Test.State.passed test) @(Test.State.failed test))
+            (cons-last `(Test.print-test-results test)
+                       `(do %@(with-test-internal 'test forms))))))))
 
   (defmacro run-all []
-    (do
-      (eval
-        `(defn main []
-          (let-do [total-passed 0
-                   total-failed 0]
-            %@(map
-              (fn [suite]
-                `(let-do [r (%suite)]
-                  (set! total-passed (+ total-passed @(Pair.a &r)))
-                  (set! total-failed (+ total-failed @(Pair.b &r)))))
-              Suite.*suites*)
-            (IO.println &(String.concat &[@"
+    `(do
+      (defn main []
+        (let-do [total-passed 0
+                 total-failed 0]
+          %@(map
+            (fn [suite]
+              `(let-do [r (%suite)]
+                (set! total-passed (+ total-passed @(Pair.a &r)))
+                (set! total-failed (+ total-failed @(Pair.b &r)))))
+            Suite.*suites*)
+          (IO.println &(String.concat &[@"
 All suites: " (Int.str total-passed) @" passed, " (Int.str total-failed) @" failed"]))
-            total-failed)))
+          total-failed))
       (build)
       (run)
       (quit))))
